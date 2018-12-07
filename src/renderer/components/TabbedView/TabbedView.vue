@@ -1,5 +1,5 @@
 <template>
-	<tab-header :specs='specifications' :activeSpecId='activeSpecId'></tab-header>
+	<tab-header :tabs='tabs' :activeTab='active'></tab-header>
 </template>
 
 <script>
@@ -10,7 +10,7 @@
 		},
 		data() {
 			return {
-				specifications: [
+				tabs: [
 					{
 						id: 1,
 						title: 'New Tab 1',
@@ -20,7 +20,7 @@
 						title: 'New Tab 2',
 					},
 				],
-				activeSpecId: 1,
+				active: 1,
 			};
 		},
 	};
