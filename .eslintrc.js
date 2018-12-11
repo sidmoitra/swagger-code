@@ -1,3 +1,5 @@
+// https://eslint.org/docs/user-guide/configuring
+
 module.exports = {
 	root: true,
 	parser: 'babel-eslint',
@@ -9,25 +11,40 @@ module.exports = {
 		node: true
 	},
 	extends: 'airbnb-base',
-	globals: {
-		__static: true
-	},
+	// required to lint *.vue files
 	plugins: [
 		'html'
 	],
-	'rules': {
-		'global-require': 0,
-		'import/no-unresolved': 0,
-		'no-param-reassign': 0,
-		'no-shadow': 0,
-		'import/extensions': 0,
-		'import/newline-after-import': 0,
-		'no-multi-assign': 0,
-		// allow debugger during development
-		'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-		'no-console': process.env.NODE_ENV === 'production' ? 2 : 0,
-		'indent': [2, 'tab'],
-		'no-tabs': 0,
+	// check if imports actually resolve
+	settings: {
+		'import/resolver': {
+			webpack: {
+				config: {
+					resolve: {
+						extensions: ['.js', '.vue']
+					},
+				},
+			},
+		},
+	},
+	// add your custom rules here
+	rules: {
+		// don't require .vue extension when importing
+		'import/extensions': ['error', 'always', {
+			js: 'never',
+			vue: 'never'
+		}],
+		// disallow reassignment of function parameters
+		// disallow parameter object manipulation except for specific exclusions
+		'no-param-reassign': ['error', {
+			props: true,
+			ignorePropertyModificationsFor: [
+				'state', // for vuex state
+				'acc', // for reduce accumulators
+				'e' // for e.returnvalue
+			]
+		}],
+		// allow optionalDependencies
 		'import/no-extraneous-dependencies': [
 			'error', 
 			{
@@ -37,5 +54,13 @@ module.exports = {
 			}
 		],
 		'no-plusplus': 'off',
+		// allow debugger during development
+		'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+		// allow debugger during development
+		'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+		'no-console': process.env.NODE_ENV === 'production' ? 2 : 0,
+		'indent': [2, 'tab'],
+		'no-tabs': 0,
+		'no-param-reassign': 0,
 	}
 }

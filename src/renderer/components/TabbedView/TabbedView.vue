@@ -3,7 +3,8 @@
 </template>
 
 <script>
-	import TabHeader from '@/components/TabbedView/TabHeader';
+	import TabHeader from './TabHeader';
+	
 	export default {
 		components: {
 			TabHeader,

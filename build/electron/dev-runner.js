@@ -62,7 +62,7 @@ function startRenderer () {
     const server = new WebpackDevServer(
       compiler,
       {
-        contentBase: path.join(__dirname, '../'),
+        contentBase: path.join(__dirname, '../../'),
         quiet: true,
         before (app, ctx) {
           app.use(hotMiddleware)
@@ -79,7 +79,7 @@ function startRenderer () {
 
 function startMain () {
   return new Promise((resolve, reject) => {
-    mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.js')].concat(mainConfig.entry.main)
+    mainConfig.entry.main = [path.join(__dirname, '../../src/main/index.dev.js')].concat(mainConfig.entry.main)
 
     const compiler = webpack(mainConfig)
 
@@ -114,7 +114,7 @@ function startMain () {
 }
 
 function startElectron () {
-  electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')])
+  electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../../dist/electron/main.js')])
 
   electronProcess.stdout.on('data', data => {
     electronLog(data, 'blue')
@@ -149,8 +149,8 @@ function greeting () {
   const cols = process.stdout.columns
   let text = ''
 
-  if (cols > 104) text = 'electron-vue'
-  else if (cols > 76) text = 'electron-|vue'
+  if (cols > 104) text = 'swagger-ui'
+  else if (cols > 76) text = 'swagger-|ui'
   else text = false
 
   if (text) {
@@ -159,13 +159,13 @@ function greeting () {
       font: 'simple3d',
       space: false
     })
-  } else console.log(chalk.yellow.bold('\n  electron-vue'))
+  } else console.log(chalk.yellow.bold('\n  swagger-ui'))
   console.log(chalk.blue('  getting ready...') + '\n')
 }
 
 function init () {
   greeting()
-
+  
   Promise.all([startRenderer(), startMain()])
     .then(() => {
       startElectron()

@@ -2545,19 +2545,28 @@ var changePermissions = exports.changePermissions = function changePermissions(d
 
 /* WEBPACK VAR INJECTION */(function(__dirname) {var _require = __webpack_require__(2),
     app = _require.app,
-    BrowserWindow = _require.BrowserWindow;
+    BrowserWindow = _require.BrowserWindow; // eslint-disable-line
+
+/**
+ * Set `__static` path to static files in production
+ * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
+ */
+
 
 if (process.env.NODE_ENV !== 'development') {
-	global.__static = __webpack_require__(0).join(__dirname, '/static').replace(/\\/g, '\\\\');
+	global.__static = __webpack_require__(0).join(__dirname, '/static').replace(/\\/g, '\\\\'); // eslint-disable-line
 }
 
 var mainWindow = void 0;
 var winURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080' : 'file://' + __dirname + '/index.html';
 
 function createWindow() {
+	/**
+   * Initial window options
+   */
 	mainWindow = new BrowserWindow({
 		useContentSize: true,
-
+		// fullscreen: true,
 		title: process.env.APP_NAME
 	});
 
@@ -2582,6 +2591,26 @@ app.on('activate', function () {
 		createWindow();
 	}
 });
+
+/**
+ * Auto Updater
+ *
+ * Uncomment the following code below and install `electron-updater` to
+ * support auto updating. Code Signing with a valid certificate is required.
+ * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
+ */
+
+/*
+import { autoUpdater } from 'electron-updater'
+
+autoUpdater.on('update-downloaded', () => {
+  autoUpdater.quitAndInstall()
+})
+
+app.on('ready', () => {
+  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+})
+ */
 /* WEBPACK VAR INJECTION */}.call(exports, "src/main"))
 
 /***/ }),
@@ -2596,11 +2625,22 @@ module.exports = __webpack_require__(15);
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/**
+ * This file is used specifically and only for development. It installs
+ * `electron-debug` & `vue-devtools`. There shouldn't be any need to
+ *  modify this file, but it can be used to extend your development
+ *  environment.
+ */
 
+/* eslint-disable */
+
+// Set environment for development
 process.env.NODE_ENV = 'development';
 
+// Install `electron-debug` with `devtron`
 __webpack_require__(18)({ showDevTools: true });
 
+// Install `vue-devtools`
 __webpack_require__(2).app.on('ready', function () {
 	var installExtension = __webpack_require__(30);
 	installExtension.default(installExtension.VUEJS_DEVTOOLS).then(function () {}).catch(function (err) {
@@ -2608,6 +2648,7 @@ __webpack_require__(2).app.on('ready', function () {
 	});
 });
 
+// Require `main` process to boot app
 __webpack_require__(15);
 
 /***/ }),
@@ -2620,30 +2661,35 @@ const electron = __webpack_require__(2);
 const localShortcut = __webpack_require__(19);
 const isDev = __webpack_require__(29);
 
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const {app, BrowserWindow} = electron;
 const isMacOS = process.platform === 'darwin';
 
-function devTools(win) {
-	win = win || BrowserWindow.getFocusedWindow();
+const devToolsOptions = {};
 
+function toggleDevTools(win = BrowserWindow.getFocusedWindow()) {
 	if (win) {
-		win.toggleDevTools();
+		const {webContents} = win;
+		if (webContents.isDevToolsOpened()) {
+			webContents.closeDevTools();
+		} else {
+			webContents.openDevTools(devToolsOptions);
+		}
 	}
 }
 
-function openDevTools(win, showDevTools) {
-	win = win || BrowserWindow.getFocusedWindow();
-
+function devTools(win = BrowserWindow.getFocusedWindow()) {
 	if (win) {
-		const mode = showDevTools === true ? undefined : showDevTools;
-		win.webContents.openDevTools({mode});
+		toggleDevTools(win);
 	}
 }
 
-function refresh(win) {
-	win = win || BrowserWindow.getFocusedWindow();
+function openDevTools(win = BrowserWindow.getFocusedWindow()) {
+	if (win) {
+		win.webContents.openDevTools(devToolsOptions);
+	}
+}
 
+function refresh(win = BrowserWindow.getFocusedWindow()) {
 	if (win) {
 		win.webContents.reloadIgnoringCache();
 	}
@@ -2659,7 +2705,7 @@ function inspectElements() {
 		if (win.webContents.isDevToolsOpened()) {
 			inspect();
 		} else {
-			win.webContents.on('devtools-opened', inspect);
+			win.webContents.once('devtools-opened', inspect);
 			win.openDevTools();
 		}
 	}
@@ -2675,30 +2721,43 @@ const addExtensionIfInstalled = (name, getPath) => {
 		if (!isExtensionInstalled(name)) {
 			BrowserWindow.addDevToolsExtension(getPath(name));
 		}
-	} catch (err) {}
+	} catch (_) {}
 };
 
 module.exports = opts => {
 	opts = Object.assign({
 		enabled: null,
-		showDevTools: false
+		showDevTools: true,
+		devToolsMode: 'undocked'
 	}, opts);
 
 	if (opts.enabled === false || (opts.enabled === null && !isDev)) {
 		return;
 	}
 
-	app.on('browser-window-created', (e, win) => {
+	if (opts.devToolsMode !== 'previous') {
+		devToolsOptions.mode = opts.devToolsMode;
+	}
+
+	app.on('browser-window-created', (event, win) => {
 		if (opts.showDevTools) {
-			openDevTools(win, opts.showDevTools);
+			win.webContents.once('devtools-opened', () => {
+				// Workaround for https://github.com/electron/electron/issues/13095
+				setImmediate(() => {
+					win.focus();
+				});
+			});
+
+			/// Workaround for https://github.com/electron/electron/issues/12438
+			win.webContents.once('dom-ready', () => {
+				openDevTools(win, opts.showDevTools);
+			});
 		}
 	});
 
 	app.on('ready', () => {
 		addExtensionIfInstalled('devtron', name => !(function webpackMissingModule() { var e = new Error("Cannot find module \".\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()).path);
-		// TODO: Use this when https://github.com/firejune/electron-react-devtools/pull/6 is out
-		// addExtensionIfInstalled('electron-react-devtools', name => require(name).path);
-		addExtensionIfInstalled('electron-react-devtools', name => __webpack_require__(0).dirname(/*require.resolve*/(!(function webpackMissingModule() { var e = new Error("Cannot find module \".\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))));
+		addExtensionIfInstalled('electron-react-devtools', name => !(function webpackMissingModule() { var e = new Error("Cannot find module \".\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()).path);
 
 		localShortcut.register('CmdOrCtrl+Shift+C', inspectElements);
 		localShortcut.register(isMacOS ? 'Cmd+Alt+I' : 'Ctrl+Shift+I', devTools);

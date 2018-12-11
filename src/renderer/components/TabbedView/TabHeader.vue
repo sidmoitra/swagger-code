@@ -1,8 +1,7 @@
 <template>
 	<div class="chrome-tabs">
 		<div class="chrome-tabs-content" ref="tabsContent">
-			<div class="chrome-tab" v-for="(tab, index) in tabsArray" 
-					ref="tabs"
+			<div class="chrome-tab" v-for="(tab, index) in tabsArray"
 					:key="tab.id"
 					:id="'tab-'+tab.id"
 					v-bind:class="{ 'chrome-tab-current' : tab.id === activeTabId}"
@@ -23,17 +22,7 @@
 <script>
 	// const isNodeContext = true;
 	const DEFAULT_TAB_TITLE = 'New Tab';
-	const DEFAULT_TAB_FAVICON = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABNSURBVDhPYxg0oBWIfwLxfyIwSF0LEKMAkCAfhAkHgkD8C8JEAfxADFKPAkAmYwPotoPwHyiNAjAE8ACQyygyAARGDaCVAaTi4QEYGAAqjTH4t0uQNwAAAABJRU5ErkJggg==">';
-	const TAB_TEMPLATE = `
-			<div class="chrome-tab chrome-tab-current">
-				<div class="chrome-tab-background">
-					<svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
-				</div>
-				<div class="chrome-tab-favicon">${DEFAULT_TAB_FAVICON}</div>
-				<div class="chrome-tab-title">${DEFAULT_TAB_TITLE}</div>
-				<div class="chrome-tab-close"></div>
-			</div>
-		`;
+	
 	/*
 	const DEFAULT_TAB_PROPERTIES = {
 		title: DEFAULT_TAB_TITLE,
@@ -63,40 +52,37 @@
 		},
 		methods: {
 			handleTabClick(newTab) {
-				console.log(`Clicked: ${newTab}`);
 				this.newActiveTab = newTab;
 			},
 			handleTabClose(closedTabId) {
-				// console.log(`Clicked Close: ${closedTabId}`);
 				const closedTabIndex = this.tabsArray.findIndex(arrEl => arrEl.id === closedTabId);
-				const closedTab = this.tabsArray[closedTabIndex];
-
+				// const closedTab = this.tabsArray[closedTabIndex];
 				const tabArrMaxIndex = this.tabsArray.length - 1;
-				let newTabId = undefined;
+				let newTabId;
 				if (closedTabIndex > 0 && tabArrMaxIndex > 0) {
 					newTabId = this.tabsArray[closedTabIndex - 1].id;
 				} else if (closedTabIndex === 0 && tabArrMaxIndex > 0) {
 					newTabId = this.tabsArray[1].id;
 				} else if (closedTabIndex === 0 && tabArrMaxIndex === 0) {
-					// Create new DEFAULT tab 
-					console.log(`Will create new DEFAULT tab`);
-					newTabId = 12;
+					// Create new DEFAULT tab
+					newTabId = 1;
+					this.addDefaultTabWithId(newTabId);
 				}
-				this.tabs.$remove(closedTab, 1);
-				
+				this.tabs.splice(closedTabIndex, 1);
 				this.handleTabClick(newTabId);
-				console.log(this.tabs);
-				this.layoutTabs();
 				// Emit event
 			},
+			addDefaultTabWithId(newTabId) {
+				this.tabs.push({ id: newTabId, title: DEFAULT_TAB_TITLE });
+			},
 			layoutTabs() {
-				requestAnimationFrame(() => {
-					console.log(this.$refs.tabs);
-					this.$refs.tabs.forEach((tab, index) => {
-						console.log(`requestAnimationFrame for tab ${tab}`);
-						tab.style.width = `${this.tabWidth}px`;
-						tab.style.transform = `translate3d(${index * this.tabEffectiveWidth}px, 0, 0)`;
-					});
+				window.requestAnimationFrame(() => {
+					if (this.$refs.tabsContent.childNodes) {
+						this.$refs.tabsContent.childNodes.forEach((tab, index) => {
+							tab.style.width = `${this.tabWidth}px`;
+							tab.style.transform = `translate3d(${index * this.tabEffectiveWidth}px, 0, 0)`;
+						});
+					}
 				});
 			},
 			/*
@@ -117,7 +103,6 @@
 					this.newActiveTab = this.activeTab && Number.isInteger(this.activeTab) ?
 						this.activeTab : this.tabsArray[0].id;
 				}
-				// console.log(`New Active tab calculated: ${this.newActiveTab}`);
 				return this.newActiveTab;
 			},
 			tabWidth() {
@@ -139,9 +124,12 @@
 			this.layoutTabs();
 		},
 
+		updated() {
+			this.layoutTabs();
+		},
+
 		watch: {
 			newActiveTab() {
-				// console.log(`Watching newActiveTab value: ${this.newActiveTab}`);
 				// Emit event that tab was activated
 			},
 		},

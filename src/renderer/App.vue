@@ -1,17 +1,17 @@
 <template>
-  <div id="app">
+	<div id="app">
 	 	<v-app>
-      <!-- Toolbar -->
+			<!-- Toolbar -->
 			<toolbar></toolbar>
 			<!-- Main Content -->
-      <main-content></main-content>
-    </v-app>
-  </div>
+			<main-content></main-content>
+		</v-app>
+	</div>
 </template>
 
 <script>
-	import Toolbar from '@/components/Toolbar/Toolbar';
-	import MainContent from '@/components/MainContent';
+	import Toolbar from './components/Toolbar/Toolbar';
+	import MainContent from './components/MainContent';
 
 	export default {
 		components: {

@@ -7,7 +7,8 @@
 </template>
 
 <script>
-	import TabbedView from '@/components/TabbedView/TabbedView';
+	import TabbedView from './TabbedView/TabbedView';
+
 	export default {
 		components: {
 			TabbedView,
