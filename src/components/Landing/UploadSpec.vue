@@ -8,7 +8,7 @@
 				<v-layout align-center justify-start row fill-height>
 					<v-text-field
 							label="Path of Swagger specification"
-							v-model="location" disabled />
+							v-model="filename" disabled />
 					<v-btn flat icon color="blue-grey"
 						@click="handleSelectFile"
 					>
@@ -26,21 +26,26 @@ import fileDialog from 'file-dialog';
 export default {
 	data() {
 		return {
-			location: 'Select',
+			filename: 'Select',
+			rules: {
+				validFile: val,
+			},
 		};
 	},
 
 	methods: {
 		handleSelectFile() {
-			fileDialog({ multiple: false, accept: 'yaml/*' })
+			fileDialog({ multiple: false, accept: 'yaml' })
 				.then((files) => {
 					const reader = new FileReader();
 					if (files[0]) {
-						this.location = files[0].name;
-						reader.onload = (e) => {
-							console.log(`On Load: ${reader.result}`);
-						};
-						reader.readAsText(files[0]);
+						if (files[0].name.endsWith('.yaml') || files[0].name.endsWith('.yml') || files[0].name.endsWith('.json')) {
+							this.filename = files[0].name;
+							reader.onload = () => {
+								console.log(`On Load: ${reader.result}`);
+							};
+							reader.readAsText(files[0]);
+						}
 					}
 				});
 		},
