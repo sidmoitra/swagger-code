@@ -7,6 +7,7 @@
 									wrap
 									align-center="true"
 									align-content-center="true"
+									v-on:upload-specification="specificationUploaded"
 				>
 					<router-view></router-view>
 				</v-layout>
@@ -27,6 +28,12 @@ export default {
 		return {
 			//
 		};
+	},
+	methods: {
+		specificationUploaded(specification) {
+			console.log(specification);
+			this.$router.push('/editor');
+		},
 	},
 };
 </script>

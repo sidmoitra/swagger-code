@@ -15,6 +15,11 @@
 						<v-icon>fas fa-upload</v-icon>
 					</v-btn>
 				</v-layout>
+				<div class="layout caption font-weight-medium font-italic red--text"
+					v-if="invalidFileSelected"
+				>
+					The selected file can only the the extensions: .yaml, .yml, .json
+				</div>
 			</v-card-text>
 		</v-card>
 	</v-flex>
@@ -27,14 +32,13 @@ export default {
 	data() {
 		return {
 			filename: 'Select',
-			rules: {
-				validFile: val,
-			},
+			invalidFileSelected: false,
 		};
 	},
 
 	methods: {
 		handleSelectFile() {
+			this.resetInvalidFileSelection();
 			fileDialog({ multiple: false, accept: 'yaml' })
 				.then((files) => {
 					const reader = new FileReader();
@@ -42,12 +46,21 @@ export default {
 						if (files[0].name.endsWith('.yaml') || files[0].name.endsWith('.yml') || files[0].name.endsWith('.json')) {
 							this.filename = files[0].name;
 							reader.onload = () => {
-								console.log(`On Load: ${reader.result}`);
+								const specification = JSON.parse(reader.result);
+								this.sendSpecificationEvent(specification);
 							};
 							reader.readAsText(files[0]);
+						} else {
+							this.invalidFileSelected = true;
 						}
 					}
 				});
+		},
+		resetInvalidFileSelection() {
+			this.invalidFileSelected = false;
+		},
+		sendSpecificationEvent(specification) {
+			this.$emit('upload-specification', specification);
 		},
 	},
 };
