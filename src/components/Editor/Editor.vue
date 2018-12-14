@@ -1,15 +1,10 @@
 <template>
-	<div>{{ JSON.stringify(specification) }}</div>
+	<div>Hi {{ JSON.stringify(spec) }}</div>
 </template>
 
 <script>
 export default {
-	props: {
-		specification: {
-			type: Object,
-			required: false,
-		},
-	},
+	props: ['spec'],
 };
 </script>
 

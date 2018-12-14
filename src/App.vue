@@ -18,11 +18,13 @@
 
 <script>
 import Toolbar from './components/Toolbar/Toolbar';
+import ChooseSpec from './components/Landing/ChooseSpec';
 
 export default {
 	name: 'App',
 	components: {
 		Toolbar,
+		ChooseSpec,
 	},
 	data() {
 		return {

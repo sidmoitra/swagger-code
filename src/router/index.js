@@ -22,6 +22,7 @@ export default new Router({
 			path: '/edit',
 			name: 'Editor',
 			component: Editor,
+			props: true,
 		},
 	],
 });

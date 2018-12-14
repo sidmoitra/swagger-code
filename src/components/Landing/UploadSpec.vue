@@ -48,6 +48,12 @@ export default {
 							reader.onload = () => {
 								const specification = JSON.parse(reader.result);
 								this.sendSpecificationEvent(specification);
+								this.$router.push({
+									name: 'Editor',
+									params: {
+										spec: specification,
+									},
+								});
 							};
 							reader.readAsText(files[0]);
 						} else {
