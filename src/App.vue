@@ -3,10 +3,8 @@
 		<toolbar></toolbar>
 		<v-content app>
 			<v-container fill-height align-start>
-				<v-layout text-xs-center
+				<v-layout
 									wrap
-									align-center="true"
-									align-content-center="true"
 									v-on:upload-specification="specificationUploaded"
 				>
 					<router-view></router-view>
